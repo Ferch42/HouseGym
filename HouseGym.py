@@ -7,10 +7,10 @@ class HouseGym(gym.Env):
 
     def __init__(self):
         """
-        The HouseGym has 11 types of symbolic labels:
+        The HouseGym has 10 types of symbolic labels:
             00 -> Nothing 
-            01 -> Bed 🛏️
-            02 -> Computer 🖥️
+            01 -> Bed 🛌🏻
+            02 -> Computer 💻
             03 -> Carpet 🟥
             04 -> Corridor C
             05 -> Fridge 🧊
@@ -36,19 +36,34 @@ class HouseGym(gym.Env):
             3: np.array([0, -1]),
         }
 
-        self.map = [[(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)],
-                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)]
-                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)]
-                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)]
-                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)]]
+        self.emoji = {
+            0: '  ', 1: '🛏️ ', 2: '💻', 3: '🟥', 4: 'C ', 5: '🧊', 6: 'B ', 7: 'K ', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
+        }
+        # Map is a matrix of tuples ("LOCATION", "FLOORTYPE", "OBJECT")
+        self.map = [[(8,0,9), (4,3,0), (6,0,0), (6,0,1), (6,0,10)],
+                    [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,2)],
+                    [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,0)],
+                    [(8,0,0), (4,3,0), (6,0,0), (7,0,0), (7,0,0)],
+                    [(8,0,0), (4,3,0), (4,3,0), (7,0,0), (7,0,5)]]
     
-    def render():
+    def render(self):
 
-        pass
+        for row in self.map:
+            print('-'*(8*self.size- self.size+ 1))
+            row_string  = '|'
+            for element in row:
+                element_string = self.emoji[element[0]] + self.emoji[element[1]] + self.emoji[element[2]] + '|'
+                row_string+= element_string
+            print(row_string)
+            print('|'+ '      |'*5)
+            print('|'+ '      |'*5)
+        print('-'*(8*self.size- self.size+ 1))
+
 
 
 
 if __name__=="__main__":
     env = HouseGym()
     print(env.observation_space.sample())
-    print("-------\n|T  🚽|\n|     |\n|   🐲|\n-------")
+
+    env.render()
