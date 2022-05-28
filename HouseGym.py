@@ -2,6 +2,8 @@
 import gym
 from gym import spaces
 import numpy as np
+import os
+import time
 
 class HouseGym(gym.Env):
 
@@ -35,6 +37,7 @@ class HouseGym(gym.Env):
             2: np.array([-1, 0]),
             3: np.array([0, -1]),
         }
+        self.__agent_position = np.array([0,0])
 
         self.emoji = {
             0: '  ', 1: '🛏️ ', 2: '💻', 3: '🟥', 4: 'C ', 5: '🧊', 6: 'B ', 7: 'K ', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
@@ -48,16 +51,27 @@ class HouseGym(gym.Env):
     
     def render(self):
 
-        for row in self.map:
+        os.system('cls||clear')
+        for i,row in enumerate(self.map):
             print('-'*(8*self.size- self.size+ 1))
             row_string  = '|'
-            for element in row:
+            agent_string = '|'
+            for j, element in enumerate(row):
                 element_string = self.emoji[element[0]] + self.emoji[element[1]] + self.emoji[element[2]] + '|'
                 row_string+= element_string
+                if i == self.__agent_position[0] and j == self.__agent_position[1]:
+                    agent_string += f'    {self.emoji["agent"]}|'
+                else:
+                    agent_string += '      |'
             print(row_string)
             print('|'+ '      |'*5)
-            print('|'+ '      |'*5)
+            print(agent_string)
         print('-'*(8*self.size- self.size+ 1))
+
+    def step(self,action):
+        
+        direction = self._action_to_direction[action]
+        self.__agent_position = np.clip(self.__agent_position + direction, 0, self.size -1)
 
 
 
@@ -66,4 +80,7 @@ if __name__=="__main__":
     env = HouseGym()
     print(env.observation_space.sample())
 
-    env.render()
+    for i in range(100):
+        env.step(np.random.randint(0,4))
+        env.render()
+        time.sleep(1)
