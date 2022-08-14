@@ -18,7 +18,7 @@ class HouseGym(gym.Env):
             05 -> Fridge 🧊
             06 -> Bedroom B
             07 -> Kitchen K 
-            08 -> Toilet T
+            08 -> Bathroom T
             09 -> Toilet 🚽
             10 -> Sandwich 🥪
         """
@@ -42,12 +42,17 @@ class HouseGym(gym.Env):
         self.emoji = {
             0: '  ', 1: '🛏️ ', 2: '💻', 3: '🟥', 4: 'C ', 5: '🧊', 6: 'B ', 7: 'K ', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
         }
+        self.symbol = {
+            0: "Nothing", 1: "Bed", 2: "Computer", 3: "Carpet", 4: "Corridor", 5: "Fridge", 6: "Bedroom", 7: "Kitchen", 8: "Bathroom", 9: "Toilet", 10: "Sandwich"
+        }
         # Map is a matrix of tuples ("LOCATION", "FLOORTYPE", "OBJECT")
         self.map = [[(8,0,9), (4,3,0), (6,0,0), (6,0,1), (6,0,10)],
                     [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,2)],
                     [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,0)],
                     [(8,0,0), (4,3,0), (6,0,0), (7,0,0), (7,0,0)],
                     [(8,0,0), (4,3,0), (4,3,0), (7,0,0), (7,0,5)]]
+        
+        self.tasks = [('UNTIL', 'TRUE', "Sandwich")]
     
     def render(self):
 
@@ -68,6 +73,11 @@ class HouseGym(gym.Env):
             print(agent_string)
         print('-'*(8*self.size- self.size+ 1))
 
+    
+    def get_symbols(self):
+
+        return {self.symbol[x] for x in self.map[self.__agent_position[0]][self.__agent_position[1]]}
+
     def step(self,action):
         
         direction = self._action_to_direction[action]
@@ -83,4 +93,5 @@ if __name__=="__main__":
     for i in range(100):
         env.step(np.random.randint(0,4))
         env.render()
+        print(env.get_symbols())
         time.sleep(1)
