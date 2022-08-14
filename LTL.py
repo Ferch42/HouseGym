@@ -52,12 +52,8 @@ def prog(truth_assignments, formula):
     
     # Until
     if formula[0] == "UNTIL":
-
-        print(formula)
-        
         P1 = prog(truth_assignments, formula[1])
         P2 = prog(truth_assignments, formula[2])
-        print(P1, P2)
 
         if P2:
             return True
@@ -69,11 +65,27 @@ def prog(truth_assignments, formula):
 
 
 def main():
-
+    
+    # TEST CASES
     #print(OPERATORS)
+    assert(prog({"BACON"}, "BACON"))
+    assert(not prog("BACON", "BEANS"))
+    assert(prog({"BACON", "EGG"}, ("AND", "EGG", "BACON")))
+    assert(not prog({"EGG"}, ("AND", "EGG", "BACON")))
+    assert(not prog({"BACON"}, ("AND", "EGG", "BACON")))
+    assert(prog({"BACON"}, ("NEXT", "BACON")) == "BACON")
+    assert(not prog({"BACON"}, ("NOT", "BACON")))
+    
     T3 = ("UNTIL", "TRUE", ("AND", "EGG", "BACON"))
-    #print(extract_propositions(T3))
 
+    assert(prog({"BACON"}, T3) == T3)
+    assert(prog({"BACON", "EGG"}, T3))
+
+    T4 = ("UNTIL", "BANANA", "BACON")
+    
+    assert(prog({"BANANA"}, T4) == T4)
+    assert(not prog({}, T4))
+    assert(prog({"BANANA", "BACON"}, T4))
     T1 = ("NEXT", "BACON")
     print(prog({"BACON"}, T1))
 
