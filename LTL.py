@@ -20,18 +20,6 @@ OPERATORS = {"NOT", "AND", "OR", "UNTIL", "NEXT"}
 UNARY_OPERATORS = {"NOT", "NEXT"}
 BINARY_OPERATORS = {"AND", "OR", "UNTIL"}
 
-def extract_propositions(formula):
-    # Base case
-    if type(formula)==str:
-        if formula in TRUTH_SYMBOLS:
-            return []
-        return [formula]
-    # Unary operators
-    if formula[0] in UNARY_OPERATORS:
-        return extract_propositions(formula[1])
-    # Binary operators
-    return extract_propositions(formula[1]) + extract_propositions(formula[2])
-
 
 def is_proposition(formula):
 
