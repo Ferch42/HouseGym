@@ -41,10 +41,14 @@ def is_proposition(formula):
 
 def prog(truth_assignments, formula):
     
+    # Base case when TRUE
+    if formula == 'TRUE':
+        return True
+
     # Base case when formula is proposition
     if is_proposition(formula):
         # Verifying the propostion has a truth assignment
-        return formula in truth_assignments.union("TRUE")
+        return formula in truth_assignments
 
     # Negation
     if formula[0]=="NOT":
@@ -52,7 +56,7 @@ def prog(truth_assignments, formula):
 
     # And
     if formula[0] == "AND":
-        return prog(truth_assignments, formula[1], formula[2])
+        return prog(truth_assignments, formula[1]) and prog(truth_assignments, formula[2])
 
     # Next
     if formula[0] == "NEXT":
@@ -61,12 +65,15 @@ def prog(truth_assignments, formula):
     # Until
     if formula[0] == "UNTIL":
 
+        print(formula)
+        
         P1 = prog(truth_assignments, formula[1])
         P2 = prog(truth_assignments, formula[2])
+        print(P1, P2)
 
-        if P1:
-            return True
         if P2:
+            return True
+        if P1:
             return formula
         return False
 
@@ -75,9 +82,9 @@ def prog(truth_assignments, formula):
 
 def main():
 
-    print(OPERATORS)
+    #print(OPERATORS)
     T3 = ("UNTIL", "TRUE", ("AND", "EGG", "BACON"))
-    print(extract_propositions(T3))
+    #print(extract_propositions(T3))
 
     T1 = ("NEXT", "BACON")
     print(prog({"BACON"}, T1))
