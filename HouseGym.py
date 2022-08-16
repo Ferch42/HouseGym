@@ -4,6 +4,7 @@ from gym import spaces
 import numpy as np
 import os
 import time
+from LTL import *
 
 class HouseGym(gym.Env):
 
@@ -23,12 +24,7 @@ class HouseGym(gym.Env):
             10 -> Sandwich 🥪
         """
         self.size = 5
-        self.observation_space = spaces.Dict(
-            {
-                "agent": spaces.Box(0, self.size - 1, shape=(2,), dtype=int),
-                "target": spaces.Box(0, self.size - 1, shape=(2,), dtype=int),
-            }
-        )
+        self.observation_space = spaces.Box(0, self.size - 1, shape=(2,), dtype=int)
         self.action_space = spaces.Discrete(4)
 
         self._action_to_direction = {
@@ -37,8 +33,7 @@ class HouseGym(gym.Env):
             2: np.array([-1, 0]),
             3: np.array([0, -1]),
         }
-        self.__agent_position = np.array([0,0])
-
+        
         self.emoji = {
             0: '  ', 1: '🛏️ ', 2: '💻', 3: '🟥', 4: 'C ', 5: '🧊', 6: 'B ', 7: 'K ', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
         }
@@ -53,6 +48,11 @@ class HouseGym(gym.Env):
                     [(8,0,0), (4,3,0), (4,3,0), (7,0,0), (7,0,5)]]
         
         self.tasks = [('UNTIL', 'TRUE', "Sandwich")]
+
+        self.reset()
+
+    def get_current_task(self):
+        return self.current_task
     
     def render(self):
 
@@ -74,24 +74,63 @@ class HouseGym(gym.Env):
         print('-'*(8*self.size- self.size+ 1))
 
     
+
+
+
     def get_symbols(self):
 
         return {self.symbol[x] for x in self.map[self.__agent_position[0]][self.__agent_position[1]]}
 
+    def reset(self):
+
+        self.__agent_position = np.array([0,0])
+        self.current_task = self.tasks[0]
+
+        observation = self.__agent_position.copy()
+
+        return observation, {}
+
+    
+    
+    
     def step(self,action):
         
         direction = self._action_to_direction[action]
         self.__agent_position = np.clip(self.__agent_position + direction, 0, self.size -1)
+        symbols = self.get_symbols()
+        next_task = prog(symbols,self.current_task)
+        
+        observation = self.__agent_position.copy()
+        reward = 0
+        done = False
+        
+        if type(next_task) == bool:
+            # Task complete
+            done = True
+            if next_task:
+                reward = 1
+            else:
+                reward = -1
+
+        self.current_task = next_task
+        
+        return observation, reward, done, {}
+
 
 
 
 
 if __name__=="__main__":
     env = HouseGym()
+    env.reset()
     print(env.observation_space.sample())
 
-    for i in range(100):
-        env.step(np.random.randint(0,4))
+    while True:
+        x = env.step(np.random.randint(0,4))
         env.render()
         print(env.get_symbols())
-        time.sleep(1)
+        print(x)
+        done = x[2]
+        if done:
+            break
+        time.sleep(0.1)

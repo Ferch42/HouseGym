@@ -32,6 +32,9 @@ def prog(truth_assignments, formula):
     # Base case when TRUE
     if formula == 'TRUE':
         return True
+    # Base case when formula is bool
+    if type(formula)==bool:
+        return formula
 
     # Base case when formula is proposition
     if is_proposition(formula):
