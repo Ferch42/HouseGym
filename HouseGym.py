@@ -28,10 +28,10 @@ class HouseGym(gym.Env):
         self.action_space = spaces.Discrete(4)
 
         self._action_to_direction = {
-            0: np.array([1, 0]),
-            1: np.array([0, 1]),
-            2: np.array([-1, 0]),
-            3: np.array([0, -1]),
+            0: np.array([1, 0]),  # DOWN
+            1: np.array([0, 1]),  # RIGHT
+            2: np.array([-1, 0]), # UP
+            3: np.array([0, -1]), # LEFT
         }
         
         self.emoji = {

@@ -9,12 +9,12 @@ N_TIMESTEPS = 30
 EPSILON_START = 1
 EPSILON_END = 0.1
 GAMMA = 0.99
-ALPHA = 0.01
+ALPHA = 1
 
 def main():
     env = HouseGym()
-    #q = np.full((env.size,env.size, env.action_space.n),100)
-    q = np.zeros((env.size,env.size, env.action_space.n))
+    q = np.full((env.size,env.size, env.action_space.n),100.0, dtype = np.float64)
+    #q = np.zeros((env.size,env.size, env.action_space.n))
 
     episode_rewards = []
     EPSILON = EPSILON_START
@@ -26,7 +26,7 @@ def main():
 
             # DELIBERATING ACTION
             a = 0
-            if np.random.uniform() <= EPSILON:
+            if np.random.uniform() <= 0:
                 a = env.action_space.sample()
             else:
                 q_max = q[s[0]][s[1]].max()
@@ -36,13 +36,14 @@ def main():
                     if q[s[0]][s[1]][i] == q_max:
                         actions.append(i)
                 a = random.choice(actions)
-                a = q[s[0]][s[1]].argmax()
+                #a = q[s[0]][s[1]].argmax()
 
             
             ss, reward, done, _ = env.step(a)
+            #print(q[4][2][1])
 
             total_reward += reward
-            TD_ERROR = reward + (1-done)*GAMMA*q[ss[0]][ss[1]].max() - q[s[0]][s[1]][a]
+            TD_ERROR = reward +(1-done)* GAMMA*q[ss[0]][ss[1]].max() - q[s[0]][s[1]][a]
             q[s[0]][s[1]][a] = q[s[0]][s[1]][a] + ALPHA * TD_ERROR
             s = ss
             
