@@ -9,11 +9,11 @@ N_TIMESTEPS = 30
 EPSILON_START = 1
 EPSILON_END = 0.1
 GAMMA = 0.99
-ALPHA = 1
+ALPHA = 0.01
 
 def main():
     env = HouseGym()
-    #q = np.full((env.size,env.size, env.action_space.n),1)
+    #q = np.full((env.size,env.size, env.action_space.n),100)
     q = np.zeros((env.size,env.size, env.action_space.n))
 
     episode_rewards = []
