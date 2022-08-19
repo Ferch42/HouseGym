@@ -4,7 +4,7 @@ import time
 import random
 
 
-N_EPISODES = 1_000_000
+N_EPISODES = 10_000
 N_TIMESTEPS = 30
 EPSILON_START = 1
 EPSILON_END = 0.1
@@ -17,7 +17,7 @@ q = {}
 def Q(state):
 
     if state not in q:
-        q[state] = np.full((4,), 100.0, dtype=np.float64) # initial value
+        q[state] = np.full((4,), 1.0, dtype=np.float64) # initial value
         #q[state] = np.zeros((4,))
     
     return q[state]
@@ -88,7 +88,7 @@ def main():
         env.render()
         i+=1
         time.sleep(1)
-        if i==15 or done:
+        if i==30 or done:
             break
     
     print(f"The running average reward mean of episode {episode} is {np.mean(episode_rewards[-10:])}")

@@ -73,8 +73,6 @@ def prog(truth_assignments, formula):
         else:
             return False        
 
-        return prog(truth_assignments, formula[1]) and prog(truth_assignments, formula[2])
-
     # Next
     if formula[0] == "NEXT":
         return formula[1]
@@ -82,16 +80,19 @@ def prog(truth_assignments, formula):
     # Until
     if formula[0] == "UNTIL":
 
-        print(f"formula {formula}")
+        #print(f"formula {formula}")
         P1 = prog(truth_assignments, formula[1])
         P2 = prog(truth_assignments, formula[2])
-        print(f"P1 {P1}")
-        print(f"P2 {P2}")
+        #print(f"P1 {P1}")
+        #print(f"P2 {P2}")
         if P2 and type(P2)==bool:
             return True
-        if P1 and type(P1)==bool:
-            print(f"returning {formula}")
-            return formula
+        if P1:
+            #print(f"returning {('UNTIL', formula[1], P2)}")
+            if type(P2)==bool:
+                return formula
+            else:
+                return ('UNTIL', formula[1], P2)
         return False
 
 
@@ -110,7 +111,7 @@ def main():
     assert(not prog({"BACON"}, ("NOT", "BACON")))
     
     T3 = ("UNTIL", "TRUE", ("AND", "EGG", "BACON"))
-
+    print(prog({"BACON"}, T3) )
     assert(prog({"BACON"}, T3) == T3)
     assert(prog({"BACON", "EGG"}, T3))
 
@@ -125,6 +126,11 @@ def main():
     T = ('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet')))
 
     print(prog({'Fridge'}, T))
+
+    TT = ('UNTIL', 'TRUE', ('UNTIL', 'TRUE', 'Toilet'))
+    assert(prog({'Fridge'}, T) == TT)
+    print(prog({'Toilet'}, TT))
+    assert(prog({'Toilet'}, TT))
 
 
 
