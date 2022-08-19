@@ -32,6 +32,10 @@ def prog(truth_assignments, formula):
     # Base case when TRUE
     if formula == 'TRUE':
         return True
+    
+    if formula == 'FALSE':
+        return False
+        
     # Base case when formula is bool
     if type(formula)==bool:
         return formula
@@ -47,6 +51,28 @@ def prog(truth_assignments, formula):
 
     # And
     if formula[0] == "AND":
+        #print(formula)
+        P1 = prog(truth_assignments, formula[1])
+        P2 = prog(truth_assignments, formula[2])
+        #print(P1)
+        #print(P2)
+        P1_type = type(P1)
+        P2_type = type(P2)
+        
+        if P1_type!=bool and P2_type!=bool:
+            return formula
+
+        elif P1_type==bool and P2_type==bool:
+            return P1 and P2
+        elif P1_type==bool and P1:
+
+            return formula[2]
+        elif P2_type==bool and P2:
+
+            return formula[1]
+        else:
+            return False        
+
         return prog(truth_assignments, formula[1]) and prog(truth_assignments, formula[2])
 
     # Next
@@ -55,12 +81,16 @@ def prog(truth_assignments, formula):
     
     # Until
     if formula[0] == "UNTIL":
+
+        print(f"formula {formula}")
         P1 = prog(truth_assignments, formula[1])
         P2 = prog(truth_assignments, formula[2])
-
-        if P2:
+        print(f"P1 {P1}")
+        print(f"P2 {P2}")
+        if P2 and type(P2)==bool:
             return True
-        if P1:
+        if P1 and type(P1)==bool:
+            print(f"returning {formula}")
             return formula
         return False
 
@@ -91,6 +121,10 @@ def main():
     assert(prog({"BANANA", "BACON"}, T4))
     T1 = ("NEXT", "BACON")
     print(prog({"BACON"}, T1))
+    print('-------------------')
+    T = ('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet')))
+
+    print(prog({'Fridge'}, T))
 
 
 

@@ -48,7 +48,8 @@ class HouseGym(gym.Env):
                     [(8,0,0), (4,3,0), (4,3,0), (7,0,0), (7,0,5)]]
         
         self.tasks = [
-            ('UNTIL', 'TRUE', "Sandwich"), ('UNTIL', 'TRUE', "Fridge"), ('UNTIL', 'TRUE', "Computer")
+            ('UNTIL', 'TRUE', "Sandwich"), ('UNTIL', 'TRUE', "Fridge"), ('UNTIL', 'TRUE', "Computer"),
+            ('UNTIL', 'TRUE', ('Fridge', 'AND', ('UNTIL', 'TRUE', 'Toilet')))
         ]
 
         self.reset()
@@ -88,7 +89,7 @@ class HouseGym(gym.Env):
         self.__agent_position = np.array([0,0])
         self.current_task = self.tasks[1]
 
-        observation = self.__agent_position.copy()
+        observation = (self.__agent_position[0],self.__agent_position[1]) 
 
         return observation, {}
 
@@ -102,7 +103,7 @@ class HouseGym(gym.Env):
         symbols = self.get_symbols()
         next_task = prog(symbols,self.current_task)
         
-        observation = self.__agent_position.copy()
+        observation = (self.__agent_position[0],self.__agent_position[1]) 
         reward = 0
         done = False
         
