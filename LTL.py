@@ -12,6 +12,15 @@ Definition of prog according to http://www.cs.toronto.edu/~rntoro/docs/LPOPL.pdf
 prog(sigma_i, p) = True  if p in sigma_i
 prog(sigma_i, p) = False if p not in sigma_i 
 """
+
+from itertools import chain, combinations
+
+
+def powerset(iterable):
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+
 # Truth symbols
 TRUTH_SYMBOLS = {"TRUE", "FALSE"}
 
@@ -26,6 +35,19 @@ def is_proposition(formula):
     if type(formula) == str and formula not in TRUTH_SYMBOLS.union(OPERATORS):
         return True
     return False
+
+
+def extract_propositions(formula):
+    # Base case
+    if type(formula)==str:
+        if formula in TRUTH_SYMBOLS:
+            return []
+        return [formula]
+    # Unary operators
+    if formula[0] in UNARY_OPERATORS:
+        return extract_propositions(formula[1])
+    # Binary operators
+    return extract_propositions(formula[1]) + extract_propositions(formula[2])
 
 def prog(truth_assignments, formula):
     
@@ -80,20 +102,45 @@ def prog(truth_assignments, formula):
     # Until
     if formula[0] == "UNTIL":
 
-        #print(f"formula {formula}")
         P1 = prog(truth_assignments, formula[1])
         P2 = prog(truth_assignments, formula[2])
-        #print(f"P1 {P1}")
-        #print(f"P2 {P2}")
+        
         if P2 and type(P2)==bool:
             return True
         if P1:
-            #print(f"returning {('UNTIL', formula[1], P2)}")
+
             if type(P2)==bool:
                 return formula
             else:
                 return ('UNTIL', formula[1], P2)
         return False
+
+def get_all_progressions(formula):
+
+    P = set(extract_propositions(formula))
+    Power_P = [set(x) for x in powerset(P)]
+
+    prog_formulas_list = [formula]
+    prog_formulas_set = set(formula)
+    
+    while len(prog_formulas_list)>0:
+        
+        next_formula = prog_formulas_list.pop()
+
+        for p in Power_P:
+
+            prog_formula = prog(p, next_formula)
+            
+            if prog_formula not in prog_formulas_set:
+                print(next_formula, p, prog_formula)
+                prog_formulas_set.add(prog_formula)
+                prog_formulas_list.append(prog_formula)
+    
+    return prog_formulas_set
+
+
+
+
 
 
 
@@ -131,8 +178,11 @@ def main():
     assert(prog({'Fridge'}, T) == TT)
     print(prog({'Toilet'}, TT))
     assert(prog({'Toilet'}, TT))
+    TTT = ('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet')))))
+    print(extract_propositions(TTT))
 
-
+    print([set(x) for x in powerset(set(extract_propositions(TTT)))])
+    print(get_all_progressions(TTT))
 
 if __name__ =='__main__':
     main()
