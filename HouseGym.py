@@ -50,6 +50,8 @@ class HouseGym(gym.Env):
         self.tasks = [
             ('UNTIL', 'TRUE', "Sandwich"), ('UNTIL', 'TRUE', "Fridge"), ('UNTIL', 'TRUE', "Computer"),
             ('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))),
+            ('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))))),
+            #('AND', ('NOT', ('UNTIL', 'TRUE', ('Bed'))),('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))))))
             ('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet')))))
         ]
 
@@ -88,7 +90,7 @@ class HouseGym(gym.Env):
     def reset(self):
 
         self.__agent_position = np.array([0,0])
-        self.current_task = self.tasks[4]
+        self.current_task = self.tasks[3]
 
         observation = (self.__agent_position[0],self.__agent_position[1]) 
 
@@ -137,4 +139,4 @@ if __name__=="__main__":
         done = x[2]
         if done:
             break
-        time.sleep(0.1)
+        time.sleep(1)

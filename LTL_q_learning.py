@@ -59,7 +59,7 @@ def main():
         EPSILON = max(EPSILON*0.999, EPSILON_END)
         
         episode_rewards.append(total_reward)
-
+        print(episode, done)
         if episode%100==0:
             print(f"The running average reward mean of episode {episode} is {np.mean(episode_rewards[-10:])}")
             print(f"EPISILON = {EPSILON}")
