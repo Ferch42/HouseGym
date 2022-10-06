@@ -117,7 +117,7 @@ def main():
             total_reward += reward
 
             experience_buffer.append((extended_state, a, reward, next_exteneded_state, done))
-            experience_buffer = experience_buffer[-EXPERIENCE_BUFFER_SIZE:]
+            #experience_buffer = experience_buffer[-EXPERIENCE_BUFFER_SIZE:]
             extended_state = next_exteneded_state
 
             if done:
@@ -131,33 +131,21 @@ def main():
             print(f"The running average reward mean of episode {episode} is {np.mean(episode_rewards[-10:])}")
 
             
-    # SIMULATING BEST FOUND POLICY
-    time.sleep(10)
-    
-    s, _= env.reset()
-    task = env.get_current_task()
-    extended_state = (s, task)
-    env.render()
-    time.sleep(1)
-    i = 0
-    while True:
-        
-        
-        #print(q[s[0]][s[1]])
-        a = RMAX(extended_state, experience_buffer)
-        #time.sleep(2)
-        s, reward, done, _ = env.step(a)
-        task = env.get_current_task()
-        extended_state = (s,task)
-        env.render()
-        i+=1
-        time.sleep(1)
-        if i==30 or done:
-            break
-    
-    print(f"The running average reward mean of episode {episode} is {np.mean(episode_rewards[-10:])}")
-    
+    experiences_count = len(set(experience_buffer))
+    for i in range(1,len(episode_rewards)):
+        convergence = np.mean(episode_rewards[max(0, i-10):i])
+        if convergence == 1:
+            print(f"Convergence in {i}, distinct states = {experiences_count}")
+            return i, experiences_count    
 
 
 if __name__ =='__main__':
-    main()
+    convergence_list = []
+    distinct_experiences_list = []
+    for i in range(10):
+        convergence, distinct_experiences = main()
+        #print(convergence_list)
+        convergence_list.append(convergence)
+        distinct_experiences_list.append(distinct_experiences)
+
+    print(f"TOTAL CONVERGENCE MEAN = {np.mean(convergence_list)}, TOTAL EXPERICENCES MEAN = {np.mean(distinct_experiences_list)}")
