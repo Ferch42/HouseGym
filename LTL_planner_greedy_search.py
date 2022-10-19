@@ -49,6 +49,76 @@ def BFS(state, task, experiences):
                     QUEUE.append(next_extended_state)
 
 
+def get_model(experiences):
+
+    STATES = set(x[0] for x in experiences).union(set(x[3] for x in experiences))
+    TRANSITION_MATRIX = {}  
+    REWARD_FUNCTION = {}
+
+    for s in STATES:
+        TRANSITION_MATRIX[s] = {}
+        REWARD_FUNCTION[s] = {}
+        for a in range(4): # ACTION_SPACE
+            available_experiences = [x for x in experiences if x[0] ==s and x[1] == a]
+            if len(available_experiences) == 0:
+                TRANSITION_MATRIX[s][a] = {'ABSORBING_STATE' : 1}
+                REWARD_FUNCTION[s][a] =  {'ABSORBING_STATE' : 1}
+            else:
+                next_states_set = set(x[3] for x in available_experiences)
+                number_of_experiences = len(available_experiences)
+                TRANSITION_MATRIX[s][a]  = {}
+                REWARD_FUNCTION[s][a]  = {}
+                for ns in next_states_set:
+                    next_state_experiences = [x for x in available_experiences if x[3] == ns]
+                    mean_reward = np.mean([x[2] for x in next_state_experiences])
+                    TRANSITION_MATRIX[s][a][ns] = len(next_state_experiences)/ number_of_experiences # ESTIMATE TRANSITION PROB
+                    REWARD_FUNCTION[s][a][ns] =  mean_reward
+
+    STATES.add('ABSORBING_STATE')
+    TRANSITION_MATRIX['ABSORBING_STATE'] = {x: {'ABSORBING_STATE': 1} for x in range(4)}
+    REWARD_FUNCTION['ABSORBING_STATE'] = {x: {'ABSORBING_STATE': 0} for x in range(4)}
+    
+    return STATES, TRANSITION_MATRIX, REWARD_FUNCTION   
+                    
+
+
+def RMAX(extended_state, experiences):
+    
+    STATES, TRANSITION_MATRIX, REWARD_FUNCTION = get_model(experiences)
+    V = {s: 0 for s in STATES}
+    P = {s: 0 for s in STATES}
+
+    if extended_state not in STATES:
+        return np.random.randint(4)
+    
+    # POLICY ITERATION
+    while True:
+
+        # POLICY EVALUATION
+        while True:
+            value_delta = 0
+            for s in STATES:
+                a = P[s]
+                ns_set = set(x for x in TRANSITION_MATRIX[s][a])
+                v = V[s]
+                V[s] = sum(TRANSITION_MATRIX[s][a][ns]*(REWARD_FUNCTION[s][a][ns] + GAMMA* V[ns]) for ns in ns_set)
+                value_delta = max(value_delta, abs(V[s]-v))
+                #time.sleep(2)
+            if value_delta < 0.00001:
+                break
+
+        # POLICY IMPROVEMENT
+        policy_stable = True
+        for s in STATES:
+            old_action = P[s]
+            P[s] = np.argmax([sum(TRANSITION_MATRIX[s][a][ns]*(REWARD_FUNCTION[s][a][ns] + GAMMA*V[ns]) for ns in set(x for x in TRANSITION_MATRIX[s][a])) for a in range(4)])
+            if old_action != P[s]:
+                policy_stable = False
+        
+        if policy_stable:
+            break
+
+    return P[extended_state]
 
 
 def main():
@@ -74,7 +144,7 @@ def main():
         for t in range(N_TIMESTEPS):
 
             # DELIBERATING ACTION
-            a = env.action_space.sample()
+            a = RMAX(extended_state, experience_buffer)
             
             ss, reward, done, _ = env.step(a)
             next_symbols = tuple(env.get_symbols())

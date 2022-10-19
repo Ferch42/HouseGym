@@ -104,7 +104,7 @@ if __name__ =='__main__':
     
     convergence_list = []
     distinct_experiences_list = []
-    for i in range(10):
+    for i in range(30):
         convergence, distinct_experiences = main()
         #print(convergence_list)
         convergence_list.append(convergence)

@@ -88,10 +88,10 @@ def prog(truth_assignments, formula):
             return P1 and P2
         elif P1_type==bool and P1:
 
-            return formula[2]
+            return P2
         elif P2_type==bool and P2:
 
-            return formula[1]
+            return P1
         else:
             return False        
 
@@ -112,7 +112,7 @@ def prog(truth_assignments, formula):
             if type(P2)==bool:
                 return formula
             else:
-                return ('UNTIL', formula[1], P2)
+                return P2
         return False
 
 def get_all_progressions(formula):
@@ -174,7 +174,8 @@ def main():
 
     print(prog({'Fridge'}, T))
 
-    TT = ('UNTIL', 'TRUE', ('UNTIL', 'TRUE', 'Toilet'))
+    TT = ('UNTIL', 'TRUE', 'Toilet')
+    print(prog({'Fridge'}, T))
     assert(prog({'Fridge'}, T) == TT)
     print(prog({'Toilet'}, TT))
     assert(prog({'Toilet'}, TT))
@@ -183,6 +184,20 @@ def main():
 
     print([set(x) for x in powerset(set(extract_propositions(TTT)))])
     print(get_all_progressions(TTT))
+
+    MONKEY_FORMULA = ('UNTIL', 'TRUE', ('AND', 'LigarLux',('NEXT',('UNTIL', 'LUX', 'LigarMusica'))))
+    print(prog({'abacaxi'},MONKEY_FORMULA))
+    print(prog({'LigarLux'},MONKEY_FORMULA))
+
+    print('_________________________________________________')
+    print(f"Fórmula original {MONKEY_FORMULA}")
+    print(f"Fórmula adding 'LigarMusica' {prog({'LigarMusica'},MONKEY_FORMULA)}")
+    print(f"Fórmula adding 'LigarLux' {prog({'LigarLux'},MONKEY_FORMULA)}")
+    print(f"Fórmula adding 'LigarLux', 'LUX' {prog({'LigarLux', 'LUX'},MONKEY_FORMULA)}")
+    print(f"Fórmula adding 'LigarLux', 'LUX' v2 {prog({'a'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA))}")
+    print(f"Fórmula adding 'LigarLux', 'LUX' v3 {prog({'LUX'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA))}")
+    print(f"Fórmula adding 'LigarLux', 'LUX' v4 {prog({'LigarMusica'},prog({'LUX'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA)))}")
+
 
 if __name__ =='__main__':
     main()
