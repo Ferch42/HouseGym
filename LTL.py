@@ -186,6 +186,8 @@ def main():
     print(get_all_progressions(TTT))
 
     MONKEY_FORMULA = ('UNTIL', 'TRUE', ('AND', 'LigarLux',('NEXT',('UNTIL', 'LUX', 'LigarMusica'))))
+    LIGHT_DARK_FORMULA = ('UNTIL', 'TRUE', ('AND', 'LigarLux', ('NEXT', ('UNTIL', 'LUX', ('AND', 'ApagarLux', ('NEXT', ('UNTIL', ('NOT', 'LUX'), 'CAFE')))))))
+    NOT_FORMULA = ('UNTIL', ('NOT', 'LUX'), 'CAIXA')
     print(prog({'abacaxi'},MONKEY_FORMULA))
     print(prog({'LigarLux'},MONKEY_FORMULA))
 
@@ -197,7 +199,11 @@ def main():
     print(f"Fórmula adding 'LigarLux', 'LUX' v2 {prog({'a'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA))}")
     print(f"Fórmula adding 'LigarLux', 'LUX' v3 {prog({'LUX'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA))}")
     print(f"Fórmula adding 'LigarLux', 'LUX' v4 {prog({'LigarMusica'},prog({'LUX'},prog({'LigarLux', 'LUX'},MONKEY_FORMULA)))}")
-
+    print("__________________________________________________")
+    print(f"Fórmula adding 'not formula' {prog({'LUX'},NOT_FORMULA)}")
+    print(f"Fórmula adding 'light_dark' {prog({'a'},LIGHT_DARK_FORMULA)}")
+    print(f"Fórmula adding 'light_dark' {prog({'LigarLux'},LIGHT_DARK_FORMULA)}")
+    print(f"Fórmula adding 'light_dark' {prog({'ApagarLux', 'LUX'},prog({'LigarLux'},LIGHT_DARK_FORMULA))}")
 
 if __name__ =='__main__':
     main()
