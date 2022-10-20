@@ -88,7 +88,7 @@ if __name__== "__main__":
     print(advance_world(world_2, 'Ball'))
     print('________________________________________________________________________________')
 
-    INITIAL_W = (('NOT','Light'),('NOT','Music'), ('NOT', 'Monkey'))
+    INITIAL_W = ('Light',('NOT','Music'), ('NOT', 'Monkey'))
 
     print("__________________________________________________________________")
     print(generate_formula(INITIAL_W))
