@@ -10,6 +10,13 @@ def invert_predicate(P):
         return ('NOT', P)
 
 
+
+def expand_world_into_formula(world):
+
+    LIGHT, MUSIC, MONKEY = world
+
+    return ('AND', LIGHT, ('AND', MUSIC, ('AND', MONKEY)))
+
 def advance_world(world, action):
 
     LIGHT, MUSIC , MONKEY = world
@@ -52,7 +59,26 @@ def bfs(world):
                 EXPLORED_SET.add(NEXT_W)
                 QUEUE.append(NEXT_W)
 
+
+def generate_formula(WORLD):
+
+    GOAL, PARENT_TREE =bfs(WORLD)
+    W = GOAL 
     
+    formula = expand_world_into_formula(GOAL)
+
+    while W!= WORLD:
+
+        print(f"W: {W}")
+
+        PREV_WORLD, ACTION = PARENT_TREE[W]
+        print(f"PARENT : {PARENT_TREE[W]}")
+        print(f"Formula : {formula}")
+
+        formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+        W = PREV_WORLD
+    formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+    return formula
 
 
 if __name__== "__main__":
@@ -66,16 +92,28 @@ if __name__== "__main__":
     print(advance_world(world_2, 'Ball'))
     print('________________________________________________________________________________')
 
-    GOAL, PARENT =bfs((('NOT','Light'),('NOT','Music'), ('NOT', 'Monkey')))
-    
-    print('________________________________________________________________________________')
+    INITIAL_W = (('NOT','Light'),('NOT','Music'), ('NOT', 'Monkey'))
 
-    GOAL, PARENT = bfs(('Light',('NOT','Music'), ('NOT', 'Monkey')))
+    print("__________________________________________________________________")
+    print(generate_formula(INITIAL_W))
+    print("__________________________________________________________________")
+
+    GOAL, PARENT =bfs(INITIAL_W)
+
 
     W = GOAL 
-    INITIAL_W = ('Light',('NOT','Music'), ('NOT', 'Monkey'))
+    
+    formula = expand_world_into_formula(GOAL)
+
     while W!= INITIAL_W:
 
         print(f"W: {W}")
+
+        PREV_WORLD, ACTION = PARENT[W]
         print(f"PARENT : {PARENT[W]}")
-        W = PARENT[W]
+        print(f"Formula : {formula}")
+
+        formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+        W = PREV_WORLD
+    formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+    print(formula)
