@@ -53,7 +53,8 @@ class HouseGym_2(gym.Env):
             ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', 'Radio')))),
             ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', 'LightSwitch'))))))),
             ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), 'Ball')))))))))),
-            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), ('AND', 'Ball', ('NEXT', 'Monkey'))))))))))))
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), ('AND', 'Ball', ('NEXT', 'Monkey')))))))))))),
+            ('UNTIL', ('AND', ('NOT', 'Light'), ('AND', ('NOT', 'Music'), ('NOT', 'Monkey'))), ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Light', ('AND', ('NOT', 'Music'), ('NOT', 'Monkey'))), ('AND', 'Radio', ('NEXT', ('UNTIL', ('AND', 'Light', ('AND', 'Music', ('NOT', 'Monkey'))), ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', ('NOT', 'Light'), ('AND', 'Music', ('NOT', 'Monkey'))), ('AND', 'Ball', ('NEXT', ('AND', ('NOT', 'Light'), ('AND', 'Music', 'Monkey'))))))))))))))
         ]
 
         self.reset()
@@ -102,7 +103,7 @@ class HouseGym_2(gym.Env):
     def reset(self):
 
         self.__agent_position = np.array([0,0])
-        self.current_task = self.tasks[3]
+        self.current_task = self.tasks[4]
         self.LIGHT = False
         self.MUSIC = False
         self.MONKEY = False

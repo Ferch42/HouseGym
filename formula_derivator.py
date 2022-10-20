@@ -15,7 +15,7 @@ def expand_world_into_formula(world):
 
     LIGHT, MUSIC, MONKEY = world
 
-    return ('AND', LIGHT, ('AND', MUSIC, ('AND', MONKEY)))
+    return ('AND', LIGHT, ('AND', MUSIC,  MONKEY))
 
 def advance_world(world, action):
 
@@ -71,9 +71,9 @@ def generate_formula(WORLD):
 
         PREV_WORLD, ACTION = PARENT_TREE[W]
         
-        formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+        formula = ('UNTIL', expand_world_into_formula(PREV_WORLD), ('AND', ACTION, ('NEXT', formula)))
         W = PREV_WORLD
-    formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
+    #formula = ('UNTIL', expand_world_into_formula(PREV_WORLD), ('AND', ACTION, ('NEXT', formula)))
     return formula
 
 
