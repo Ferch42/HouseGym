@@ -55,6 +55,7 @@ def bfs(world):
             NEXT_W = advance_world(W, A)
             
             if NEXT_W not in EXPLORED_SET:
+
                 PARENT[NEXT_W] = (W, A)
                 EXPLORED_SET.add(NEXT_W)
                 QUEUE.append(NEXT_W)
@@ -69,6 +70,8 @@ def generate_formula(WORLD):
 
     while W!= WORLD:
 
+        print(W)
+        print(PARENT_TREE[W])
         PREV_WORLD, ACTION = PARENT_TREE[W]
         
         formula = ('UNTIL', expand_world_into_formula(PREV_WORLD), ('AND', ACTION, ('NEXT', formula)))

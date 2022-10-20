@@ -5,13 +5,14 @@ import time
 import random
 
 
-N_EPISODES = 10000
+N_EPISODES = 1000000
 N_TIMESTEPS = 100
 EPSILON_START = 1
 EPSILON_END = 0.1
-EPSILON_DECAY_RATE = 0.9
+EPSILON_DECAY_RATE = 0.99999
+ALPHA_DECAY_RATE = 0.99999
 GAMMA = 0.99
-ALPHA = 0.1
+ALPHA = 1
 
 # GLOBAL Q VALUE FUNCTION
 q = {}
@@ -26,7 +27,7 @@ def Q(state):
 
 def main():
 
-    global q
+    global q, ALPHA
     env = HouseGym_2()
     
     episode_rewards = []
@@ -42,7 +43,7 @@ def main():
 
             # DELIBERATING ACTION
             a = 0
-            if np.random.uniform() <= 0:
+            if np.random.uniform() <= EPSILON:
                 a = env.action_space.sample()
             else:
                 a = random.choice([i for i in range(env.action_space.n) if Q(extended_state)[i] == Q(extended_state).max()])
@@ -60,6 +61,7 @@ def main():
             if done:
                 break
         EPSILON = max(EPSILON* EPSILON_DECAY_RATE, EPSILON_END)
+        ALPHA = ALPHA*ALPHA_DECAY_RATE
         
         episode_rewards.append(total_reward)
         
@@ -83,10 +85,11 @@ def main():
 
         #print(episode, done)
         if episode%1000==0:
-            print(f"The running average reward mean of episode {episode} is {np.mean(rollout_rewards[-10:])}")
+            print(f"The running average reward mean of episode {episode} is {np.mean(rollout_rewards[-1000:])}")
             print(f"The number of expanded goals {len(set([x[1] for x in q.keys()]))}")
             #print(q)
             print(f"EPISILON = {EPSILON}")
+            print(f'ALPHA = {ALPHA}')
 
             #print(q)
 

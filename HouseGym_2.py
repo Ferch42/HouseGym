@@ -104,7 +104,7 @@ class HouseGym_2(gym.Env):
     def reset(self):
 
         self.__agent_position = np.array([0,0])
-        self.current_task = self.tasks[4]
+        self.current_task = self.tasks[0]
         self.LIGHT = False
         self.MUSIC = False
         self.MONKEY = False
