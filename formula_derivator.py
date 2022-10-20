@@ -69,12 +69,8 @@ def generate_formula(WORLD):
 
     while W!= WORLD:
 
-        print(f"W: {W}")
-
         PREV_WORLD, ACTION = PARENT_TREE[W]
-        print(f"PARENT : {PARENT_TREE[W]}")
-        print(f"Formula : {formula}")
-
+        
         formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
         W = PREV_WORLD
     formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
@@ -97,23 +93,3 @@ if __name__== "__main__":
     print("__________________________________________________________________")
     print(generate_formula(INITIAL_W))
     print("__________________________________________________________________")
-
-    GOAL, PARENT =bfs(INITIAL_W)
-
-
-    W = GOAL 
-    
-    formula = expand_world_into_formula(GOAL)
-
-    while W!= INITIAL_W:
-
-        print(f"W: {W}")
-
-        PREV_WORLD, ACTION = PARENT[W]
-        print(f"PARENT : {PARENT[W]}")
-        print(f"Formula : {formula}")
-
-        formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
-        W = PREV_WORLD
-    formula = ('UNTIL', PREV_WORLD, ('AND', ACTION, ('NEXT', formula)))
-    print(formula)
