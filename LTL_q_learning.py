@@ -1,16 +1,17 @@
 from HouseGym import HouseGym
+from HouseGym_2 import HouseGym_2
 import numpy as np
 import time
 import random
 
 
-N_EPISODES = 1000
-N_TIMESTEPS = 30
+N_EPISODES = 10000
+N_TIMESTEPS = 100
 EPSILON_START = 1
 EPSILON_END = 0.1
 EPSILON_DECAY_RATE = 0.9
 GAMMA = 0.99
-ALPHA = 1
+ALPHA = 0.1
 
 # GLOBAL Q VALUE FUNCTION
 q = {}
@@ -26,7 +27,7 @@ def Q(state):
 def main():
 
     global q
-    env = HouseGym()
+    env = HouseGym_2()
     
     episode_rewards = []
     rollout_rewards = []
@@ -81,11 +82,33 @@ def main():
         rollout_rewards.append(rollout_total_reward)
 
         #print(episode, done)
-        #if episode%10==0:
-            #print(f"The running average reward mean of episode {episode} is {np.mean(rollout_rewards[-10:])}")
-            #print(f"EPISILON = {EPSILON}")
+        if episode%1000==0:
+            print(f"The running average reward mean of episode {episode} is {np.mean(rollout_rewards[-10:])}")
+            print(f"The number of expanded goals {len(set([x[1] for x in q.keys()]))}")
+            #print(q)
+            print(f"EPISILON = {EPSILON}")
 
             #print(q)
+
+    print("DONE TRAINING XD")
+    print("EXECUTING BEST FOUND POLICY")
+    s, _= env.reset()
+    task = env.get_current_task()
+    extended_state = (s, task)
+    for t in range(N_TIMESTEPS):
+        a = random.choice([i for i in range(env.action_space.n) if Q(extended_state)[i] == Q(extended_state).max()])
+        env.render()
+        time.sleep(1)
+        ss, reward, done, _ = env.step(a)
+        next_task = env.get_current_task()
+        next_exteneded_state = (ss, next_task)
+        rollout_total_reward += reward
+        extended_state = next_exteneded_state
+
+        if done:
+            break
+    
+    
     experiences_count = len(q.keys())*4
     for i in range(1,len(rollout_rewards)):
         convergence = np.mean(rollout_rewards[max(0, i-10):i])
@@ -102,12 +125,4 @@ def main():
 
 if __name__ =='__main__':
     
-    convergence_list = []
-    distinct_experiences_list = []
-    for i in range(30):
-        convergence, distinct_experiences = main()
-        #print(convergence_list)
-        convergence_list.append(convergence)
-        distinct_experiences_list.append(distinct_experiences)
-
-    print(f"TOTAL CONVERGENCE MEAN = {np.mean(convergence_list)}, TOTAL EXPERICENCES MEAN = {np.mean(distinct_experiences_list)}")
+    main()

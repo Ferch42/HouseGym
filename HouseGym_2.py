@@ -52,7 +52,8 @@ class HouseGym_2(gym.Env):
         self.tasks = [
             ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', 'Radio')))),
             ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', 'LightSwitch'))))))),
-            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), 'Ball'))))))))))
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), 'Ball')))))))))),
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), ('AND', 'Ball', ('NEXT', 'Monkey'))))))))))))
         ]
 
         self.reset()
@@ -101,7 +102,7 @@ class HouseGym_2(gym.Env):
     def reset(self):
 
         self.__agent_position = np.array([0,0])
-        self.current_task = self.tasks[2]
+        self.current_task = self.tasks[3]
         self.LIGHT = False
         self.MUSIC = False
         self.MONKEY = False
