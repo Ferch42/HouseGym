@@ -6,22 +6,24 @@ import os
 import time
 from LTL import *
 
-class HouseGym(gym.Env):
+
+LIGHT_INDEX = 3
+MUSIC_INDEX = 4
+MONKEY_INDEX = 1
+
+class HouseGym_2(gym.Env):
 
     def __init__(self):
         """
         The HouseGym has 10 types of symbolic labels:
             00 -> Nothing 
-            01 -> Bed 🛌🏻
-            02 -> Computer 💻
-            03 -> Carpet 🟥
-            04 -> Corridor C
-            05 -> Fridge 🧊
-            06 -> Bedroom B
-            07 -> Kitchen K 
-            08 -> Bathroom T
-            09 -> Toilet 🚽
-            10 -> Sandwich 🥪
+            01 -> Monkey 🐒
+            02 -> Mokey_Scared 🙈
+            03 -> Light 💡
+            04 -> Music 🎵
+            05 -> LightSwitch 🔦
+            06 -> Radio 📻
+            07 -> Ball ⚽
         """
         self.size = 5
         self.observation_space = spaces.Box(0, self.size - 1, shape=(2,), dtype=int)
@@ -35,23 +37,22 @@ class HouseGym(gym.Env):
         }
         
         self.emoji = {
-            0: '  ', 1: '🛏️ ', 2: '💻', 3: '🟥', 4: 'C ', 5: '🧊', 6: 'B ', 7: 'K ', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
+            0: '  ', 1: '🐒', 2: '🙈', 3: '💡', 4: '🎵', 5: '🔦', 6: '📻', 7: '⚽', 8: 'T ', 9: '🚽', 10: '🥪', 'agent': '🐲'
         }
         self.symbol = {
-            0: "Nothing", 1: "Bed", 2: "Computer", 3: "Carpet", 4: "Corridor", 5: "Fridge", 6: "Bedroom", 7: "Kitchen", 8: "Bathroom", 9: "Toilet", 10: "Sandwich"
+            0: "Nothing", 1: "Monkey", 2: "Mokey_Scared", 3: "Light", 4: "Music", 5: "LightSwitch", 6: "Radio", 7: "Ball", 8: "Bathroom", 9: "Toilet", 10: "Sandwich"
         }
         # Map is a matrix of tuples ("LOCATION", "FLOORTYPE", "OBJECT")
-        self.map = [[(8,0,9), (4,3,0), (6,0,0), (6,0,1), (6,0,10)],
-                    [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,2)],
-                    [(8,0,0), (4,3,0), (6,0,0), (6,0,0), (6,0,0)],
-                    [(8,0,0), (4,3,0), (6,0,0), (7,0,0), (7,0,0)],
-                    [(8,0,0), (4,3,0), (4,3,0), (7,0,0), (7,0,5)]]
+        self.map = [[(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)],
+                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)],
+                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5)],
+                    [(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)],
+                    [(0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,7)]]
         
         self.tasks = [
-            ('UNTIL', 'TRUE', "Sandwich"), ('UNTIL', 'TRUE', "Fridge"), ('UNTIL', 'TRUE', "Computer"),
-            ('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))),
-            ('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))))),
-            #('AND', ('NOT', ('UNTIL', 'TRUE', ('Bed'))),('UNTIL', 'TRUE', ('AND', 'Computer',('UNTIL', 'TRUE', ('AND', 'Fridge', ('UNTIL', 'TRUE', 'Toilet'))))))
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', 'Radio')))),
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', 'LightSwitch'))))))),
+            ('UNTIL', 'TRUE', ('AND', 'LightSwitch',('NEXT',('UNTIL', 'Light', ('AND', 'Radio', ('NEXT',('UNTIL', 'Music', ('AND', 'LightSwitch', ('NEXT', ('UNTIL', ('AND', 'Music', ('NOT', 'Light')), 'Ball'))))))))))
         ]
 
         self.reset()
@@ -67,7 +68,10 @@ class HouseGym(gym.Env):
             row_string  = '|'
             agent_string = '|'
             for j, element in enumerate(row):
-                element_string = self.emoji[element[0]] + self.emoji[element[1]] + self.emoji[element[2]] + '|'
+                if i==0 and j==0:
+                    element_string = self.emoji[LIGHT_INDEX* self.LIGHT] + self.emoji[MUSIC_INDEX* self.MUSIC] + self.emoji[MONKEY_INDEX* self.MONKEY] + '|'
+                else:
+                    element_string = self.emoji[element[0]] + self.emoji[element[1]] + self.emoji[element[2]] + '|'
                 row_string+= element_string
                 if i == self.__agent_position[0] and j == self.__agent_position[1]:
                     agent_string += f'    {self.emoji["agent"]}|'
@@ -84,12 +88,23 @@ class HouseGym(gym.Env):
 
     def get_symbols(self):
 
-        return {self.symbol[x] for x in self.map[self.__agent_position[0]][self.__agent_position[1]]}
+        symbols_set = {self.symbol[x] for x in self.map[self.__agent_position[0]][self.__agent_position[1]]}
+        if self.LIGHT:
+            symbols_set.add('Light')
+        if self.MUSIC:
+            symbols_set.add('Music')
+        if self.MONKEY:
+            symbols_set.add('Monkey')
+
+        return symbols_set 
 
     def reset(self):
 
         self.__agent_position = np.array([0,0])
-        self.current_task = self.tasks[3]
+        self.current_task = self.tasks[2]
+        self.LIGHT = False
+        self.MUSIC = False
+        self.MONKEY = False
 
         observation = (self.__agent_position[0],self.__agent_position[1]) 
 
@@ -103,6 +118,14 @@ class HouseGym(gym.Env):
         direction = self._action_to_direction[action]
         self.__agent_position = np.clip(self.__agent_position + direction, 0, self.size -1)
         symbols = self.get_symbols()
+        
+        if 'LightSwitch' in symbols:
+            self.LIGHT = not self.LIGHT
+        if self.LIGHT and 'Radio' in symbols:
+            self.MUSIC = not self.MUSIC
+        if not self.LIGHT and self.MUSIC and 'Ball' in symbols:
+            self.MONKEY = not self.MONKEY
+
         next_task = prog(symbols,self.current_task)
         
         observation = (self.__agent_position[0],self.__agent_position[1]) 
@@ -126,14 +149,15 @@ class HouseGym(gym.Env):
 
 
 if __name__=="__main__":
-    env = HouseGym()
+    env = HouseGym_2()
     env.reset()
     print(env.observation_space.sample())
 
     while True:
-        x = env.step(np.random.randint(0,4))
+        x = env.step(int(input('?')))
         env.render()
         print(env.get_symbols())
+        print(env.get_current_task())
         print(x)
         done = x[2]
         if done:
