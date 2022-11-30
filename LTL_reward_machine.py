@@ -3,6 +3,7 @@ from HouseGym_2 import HouseGym_2
 import numpy as np
 import time
 import random
+import pickle
 
 
 N_EPISODES = 1000000
@@ -18,6 +19,12 @@ ALPHA = 1
 q = {}
 
 WORLD_PREDICATES = {'Light', 'Music', 'Monkey'}
+
+## REWARD MACHINE PARAMETERS
+
+RM_STATES = pickle.load(open( 'rm_states.pkl', 'rb'))
+RM_TRANSITIONS = pickle.load(open( 'rm_states.pkl', 'rb'))
+
 
 def Q(state):
 

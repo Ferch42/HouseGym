@@ -1,5 +1,7 @@
+import pickle
 world = (('NOT','Light'),('NOT','Music'), ('NOT', 'Monkey'))
-ACTIONS = {'TRUE', 'LightSwitch', 'Radio', 'Ball'}
+ACTIONS = {'Nothing', 'LightSwitch', 'Radio', 'Ball'}
+WORLD_PREDICATES = {'Light', 'Music', 'Monkey'}
 
 
 def invert_predicate(P):
@@ -9,6 +11,9 @@ def invert_predicate(P):
     elif type(P) == str:
         return ('NOT', P)
 
+def set_inator(t):
+
+    return tuple(set(x for x in t if type(x)!=tuple))
 
 
 def expand_world_into_formula(world):
@@ -20,7 +25,7 @@ def expand_world_into_formula(world):
 def advance_world(world, action):
 
     LIGHT, MUSIC , MONKEY = world
-    if action == 'TRUE':
+    if action == 'Nothing':
         return world
     
     elif action =='LightSwitch':
@@ -61,6 +66,26 @@ def bfs(world):
                 QUEUE.append(NEXT_W)
 
 
+def expand_bfs(world):
+
+    QUEUE = []
+    EXPLORED_SET = {world}
+    QUEUE.append(world)
+    TRANSITIONS = set()
+
+    while QUEUE:
+        W = QUEUE.pop(0)
+
+        for A in ACTIONS:
+            NEXT_W = advance_world(W, A)
+            TRANSITIONS.add((set_inator(W),A,set_inator(NEXT_W)))
+            if NEXT_W not in EXPLORED_SET:
+                EXPLORED_SET.add(NEXT_W)
+                QUEUE.append(NEXT_W)
+    
+    return {set_inator(x) for x in EXPLORED_SET}, TRANSITIONS
+            
+
 def generate_formula(WORLD):
 
     GOAL, PARENT_TREE =bfs(WORLD)
@@ -80,6 +105,7 @@ def generate_formula(WORLD):
     return formula
 
 
+
 if __name__== "__main__":
 
     world = ('Light',('NOT','Music'), ('NOT', 'Monkey'))
@@ -96,3 +122,16 @@ if __name__== "__main__":
     print("__________________________________________________________________")
     print(generate_formula(INITIAL_W))
     print("__________________________________________________________________")
+
+
+    INITIAL_WORLD = (('NOT', 'Light'), ('NOT', 'Music'), ('NOT', 'Monkey'))
+
+    STATES, TRANSITIONS = expand_bfs(INITIAL_WORLD)
+    print(STATES)
+    pickle.dump(STATES, open('rm_states.pkl',  'wb+'))
+    pickle.dump(TRANSITIONS, open('rm_transitions.pkl',  'wb+'))
+
+    for t in TRANSITIONS:
+        print(t)
+
+
