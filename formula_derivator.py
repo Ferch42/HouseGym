@@ -13,7 +13,7 @@ def invert_predicate(P):
 
 def set_inator(t):
 
-    return tuple(set(x for x in t if type(x)!=tuple))
+    return tuple(sorted(x for x in t if type(x)!=tuple))
 
 
 def expand_world_into_formula(world):

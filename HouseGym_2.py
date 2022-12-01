@@ -140,8 +140,8 @@ class HouseGym_2(gym.Env):
             done = True
             if next_task:
                 reward = 1
-            else:
-                reward = -1
+            #else:
+            #    reward = -1
 
         self.current_task = next_task
         

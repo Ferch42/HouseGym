@@ -6,7 +6,7 @@ import random
 import pickle
 
 
-N_EPISODES = 1000000
+N_EPISODES = 10000
 N_TIMESTEPS = 100
 EPSILON_START = 1
 EPSILON_END = 0.1
@@ -19,12 +19,17 @@ ALPHA = 1
 q = {}
 
 WORLD_PREDICATES = {'Light', 'Music', 'Monkey'}
+ACTIONS = {'Nothing', 'LightSwitch', 'Radio', 'Ball'}
+
+FLAG_CRM = True
 
 ## REWARD MACHINE PARAMETERS
 
 RM_STATES = pickle.load(open( 'rm_states.pkl', 'rb'))
-RM_TRANSITIONS = pickle.load(open( 'rm_states.pkl', 'rb'))
+RM_TRANSITIONS = pickle.load(open( 'rm_transitions.pkl', 'rb'))
 
+print(RM_STATES)
+print(RM_TRANSITIONS)
 
 def Q(state):
 
@@ -39,7 +44,7 @@ def separate_symbols(symbols):
     action_set = symbols.difference(WORLD_PREDICATES)
     world_set = symbols.difference(action_set)
 
-    return action_set, world_set
+    return action_set, tuple(sorted(world_set))
 
 
 def main():
@@ -67,11 +72,50 @@ def main():
             
             ss, reward, done, _ = env.step(a)
             next_action_set, next_world_set = separate_symbols(env.get_symbols())
+            assert(next_world_set in RM_STATES)
             next_exteneded_state = (ss, tuple(next_world_set))
             total_reward += reward
-            TD_ERROR = reward +(1-done)* GAMMA*Q(next_exteneded_state).max() - Q(extended_state)[a]
+            
+            if not FLAG_CRM:
+                TD_ERROR = reward +(1-done)* GAMMA*Q(next_exteneded_state).max() - Q(extended_state)[a]
+                Q(extended_state)[a] = Q(extended_state)[a] + ALPHA * TD_ERROR
+            
+            else:
 
-            Q(extended_state)[a] = Q(extended_state)[a] + ALPHA * TD_ERROR
+                original_s, original_w = extended_state
+                #print(original_s)
+                symbolic_action_set = next_action_set.difference({'Nothing'})
+                if len(symbolic_action_set)==1:
+                    #print(symbolic_action_set)
+                    symbolic_action = list(symbolic_action_set)[0]
+                else:
+                    symbolic_action = 'Nothing'
+
+                assert(len(symbolic_action_set)<=1)
+                for RM_S in RM_STATES:
+                    
+                    new_rm_state = (original_s, RM_S)
+                    rm_transition = [x for x in RM_TRANSITIONS if x[0] == RM_S and x[1] == symbolic_action]
+                    assert(len(rm_transition)==1)
+                    NEXT_RM_S = rm_transition[0][2]
+                    rm_reward = int('Monkey' in NEXT_RM_S)
+                    #print(NEXT_RM_S,rm_transition,rm_reward)
+                    
+                    rm_done = int('Monkey' in NEXT_RM_S)
+                    next_rm_state = (ss, NEXT_RM_S)
+                    
+
+                    TD_ERROR = rm_reward +(1-rm_done)* GAMMA*Q(next_rm_state).max() - Q(new_rm_state)[a]
+                    
+                    #print('------------------------------------------------')
+                    #print(new_rm_state, symbolic_action, rm_reward, next_rm_state)
+                    #print(new_rm_state, Q(new_rm_state)[a], TD_ERROR)
+                    Q(new_rm_state)[a] = Q(new_rm_state)[a] + ALPHA * TD_ERROR
+
+
+
+
+
             #print(q)
             extended_state = next_exteneded_state
             
