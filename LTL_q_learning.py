@@ -5,7 +5,7 @@ import time
 import random
 
 
-N_EPISODES = 1000000
+N_EPISODES = 100000
 N_TIMESTEPS = 100
 EPSILON_START = 1
 EPSILON_END = 0.1
@@ -87,11 +87,15 @@ def main():
         if episode%1000==0:
             print(f"The running average reward mean of episode {episode} is {np.mean(rollout_rewards[-1000:])}")
             print(f"The number of expanded goals {len(set([x[1] for x in q.keys()]))}")
-            #print(q)
+            print(f'The size of the state-action space is {len(q.keys())}')
+            print(q)
             print(f"EPISILON = {EPSILON}")
             print(f'ALPHA = {ALPHA}')
 
             #print(q)
+        
+            with open('ltl_formyka.txt', 'w+') as f :
+                f.write(str(q.keys()))
 
     print("DONE TRAINING XD")
     print("EXECUTING BEST FOUND POLICY")
